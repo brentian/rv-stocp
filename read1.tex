@@ -1,0 +1,192 @@
+%%%%%%%%%%%%%%%%
+% switch from arc to beamer
+%%%%%%%%%%%%%%%%
+\PassOptionsToClass{a4paper,10pt}{article} % for article mode 
+\PassOptionsToClass{aspectratio=1610,10pt}{beamer} % for beamer, handout, trans modes
+\newcommand*{\BeamerswitchSpawn}[1]{ 
+\ShellEscape{... -jobname=\jobname#1 \jobname} %
+}
+\documentclass{beamerswitch}
+\mode<article>{
+    \usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+}
+\mode<presentation>{
+    \usefonttheme[onlymath]{serif}
+}
+
+\usepackage{amsmath, amsthm, amsfonts}
+\usepackage{subfiles, bm, hyperref, graphicx, listings}
+\usepackage{authblk}
+
+% my cmd
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\newcommand{\lm}{\lambda_\textrm{max}}
+\newcommand{\trace}{\mathbf{trace}}
+\newcommand{\diag}{\mathbf{diag}}
+\newcommand{\model}[1]{(\textbf{#1})}
+\newcommand{\mx}{\mathbf{\max}\;}
+\newcommand{\mn}{\mathbf{\min}\;}
+\newcommand{\st}{\mathrm{s.t.\;}}
+\newcommand{\ex}{\mathbb E}
+\newcommand{\dx}{\;\bm dx}
+\newcommand{\pr}{\mathbb P}
+\newcommand{\id}{\mathbb I}
+\newcommand{\bp}{\mathbb P}
+\newcommand{\be}{\mathbb E}
+\newcommand{\bi}{\mathbb I}
+\newcommand{\bxi}{\bm \xi}
+\newcommand{\bo}{\bm \omega}
+\newcommand{\va}{\mathbf{Var}}
+\newcommand{\dif}{\mathbf{d}}
+\newcommand{\minp}[2]{\min\{#1, #2\}}
+\newcommand{\intp}{\mathbf{int}}
+\newcommand{\apex}{\mathbf{apex}}
+\newcommand{\conv}{\mathbf{conv}}
+%%%%%%%%%%%%%%%%
+% finish my commands
+%%%%%%%%%%%%%%%%
+
+% theorem environments
+\theoremstyle{definition}
+% my code style
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\lstdefinestyle{codestyle}{
+    basicstyle=\ttfamily\footnotesize,
+    tabsize=2
+    \scriptsize
+}
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+
+\maketitle
+\section{Preface}
+
+This monograph records the reading notes for the subject ``stochastic programming'' starting from Spring 2022. The goal is to increase the authors' familiarity in this fascinating field.
+\section{Mathematical Background}
+The part is based on \cite{shapiro_lectures_2014}, \cite{birge_introduction_2011} and so forth.
+\subsection{Basic Convex Analysis}
+
+Firstly, we introduce some definitions.
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{l|l}
+        \(K_C\)          & recession cone  to set \(C\) \\
+        \(C^*\)          & polar of cone to set \(C\)   \\
+        \(\mathcal N_C\) & normal cone to set \(C\)     \\
+        \(\mathcal R_C\) & radial cone to set \(C\)     \\
+        \(\mathcal T_C\) & tangent cone to set \(C\)
+    \end{tabular}
+    \caption{A summary of convex sets}
+\end{table}
+\begin{definition} The basic convex sets.
+
+    \begin{enumerate}[i]
+        \item The recession cone \(K_C\) of the set \(C\) is formed by vectors \(h\) such that for any \(x \in C\) and any \(t > 0\) it follows that \(x + t\cdot h \in C\).
+    \end{enumerate}
+
+\end{definition}
+\begin{theorem} The theorems for the recession cone.
+    \begin{enumerate}[i]
+        \item The \(K_C\) is convex if \(C\) is convex,
+        \item and is closed if the set C is closed.
+        \item The convex set C is bounded iff. \(K_C = \{0\}\)
+    \end{enumerate}
+\end{theorem}
+
+\begin{theorem} The theorems for the recession cone.
+    \begin{enumerate}[i]
+        \item The \(K_C\) is convex if \(C\) is convex,
+        \item and is closed if the set C is closed.
+        \item The convex set C is bounded iff. \(K_C = \{0\}\)
+    \end{enumerate}
+\end{theorem}
+
+
+\section{Two-Stage Problems}
+
+\begin{frame}[allowframebreaks]{Introduction}
+    To understand the difficulties of multistage (integer) programs, we first look at the structural properties of the value functions.
+
+    Consider the two-stage problem,
+    \begin{align*}
+        \min_{x \in \mathcal X }~ & c^T x+ \mathcal Q (x)        \\
+        \st                       & A x \leq b, x \in \mathcal X
+    \end{align*}
+    where the second stage recourse, the value function \(\mathcal Q (x) \) is defined as the expectation with a recourse variable \(y\).
+    \begin{align*}
+        \mathcal Q (x) & = \ex Q(x, \bxi)                                \\
+                       & \bxi(\omega)    = (T, W, h )(\omega)            \\
+                       & T(\bo) x+W(\bo) y=h(\bo), y \geq 0, \forall \bo \\
+        Q(x, \bxi)     & = \min_{y \in \mathcal Y} q^T y                 \\
+    \end{align*}
+
+    \paragraph{Remark}
+    \begin{itemize}
+        \item Assume random variable \(\bo \) living on some probability space, \((\Omega,\mathcal F, P)\)
+        \item The first stage variable \(x\) is made before a realization of \(\bxi\), i.e., the ``here-and-now'' ones.
+        \item The second stage variable \(y\), to be precise, should be \(\bm y(\omega)\) that actually depends on \(\bo\)
+    \end{itemize}
+\end{frame}
+\begin{frame}[allowframebreaks]{Analysis on the value function}
+
+
+    We first assume \((x, y)\) are continuous, for example, \(\mathcal X, \mathcal Y\) are convex. Define the function the support function \(s_{q}(\chi)\) of set \(\Pi(q)\), we notice,
+    \begin{align*}
+        \chi                    & = h - Tx                                                        \\
+        \Pi(q)                  & \doteq \left\{\pi: W^{\top} \pi \leq q\right\}                  \\
+        s_{q}(\chi)             & \doteq \inf \left\{q^{\top} y: W y=\chi, \quad y \geq 0\right\} \\
+        \Rightarrow s_{q}(\chi) & =\sup _{\pi \in \Pi(q)} \pi^{\top} \chi
+    \end{align*}
+
+    Obviously,
+    \begin{theorem} The value function \(Q(x, \bxi) = s_q(\chi)\), furthermore
+        \begin{enumerate}
+            \item Q is a homogeneous polyhedron function supporting \(\Pi(q)\)
+            \item Also, the subdifferential of \(Q\) could also be defined.
+                  \begin{align*}
+                      \partial Q\left(x_{0}, \bxi\right)=-T^{\top} \mathcal D \left(x_{0}, \bxi\right)
+                  \end{align*}
+                  where
+                  \begin{align*}
+                      \mathcal  D (x, \bxi) = \pi ^* \doteq \arg \max _{\pi \in \Pi(q)} \pi^{\top}(h-T x)
+                  \end{align*}
+        \end{enumerate}
+    \end{theorem}
+    \section{Analysis on Value Function}
+    Now we inspect the existence of \(Q\). Firstly, we introduce the definition,
+    \begin{definition}
+        Classification of recourse.
+        The recourse problem is,
+        \begin{enumerate}[i]
+            \item (Fixed) if the matrix \(W(\bo) = W\) is fixed (not random).
+            \item (Complete) if the system \(\{y: Wy = \chi, y \ge 0\}\) has a solution for every \(\chi\)
+            \item (Simple) if both complete and fixed
+            \item (Relatively complete) relatively complete if for every feasible \(x\),
+                  the feasible set of the second-stage problem is nonempty for almost everywhere (a.e.) \(\bm \omega \in \Omega\).
+        \end{enumerate}
+    \end{definition}
+
+    For a recourse to be complete, \(\Pi(q)\) must be bounded, i.e., the recession cone \(\Pi(0) = \{0\}\).
+
+\end{frame}
+\begin{frame}[allowframebreaks]{Two-stage integer program}
+    For the integer second stage case, first look at the example in \cite{schultz_stochastic_2003}
+
+    \[
+        \min _{\left(y, y^{\prime}\right)}\left\{q^{T} y+q^{\prime T} y^{\prime}: T x+W y+W^{\prime} y^{\prime}=h(\omega), y \in Z _{+}^{\bar{n}_{2}}, y^{\prime} \in R _{+}^{n_{2}^{\prime}}\right\}
+    \]
+\end{frame}
+\begin{frame}[allowframebreaks]
+    \bibliography{robust}
+    \bibliographystyle{apalike}
+\end{frame}
+\end{document}
