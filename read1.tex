@@ -17,6 +17,7 @@
 \usepackage{amsmath, amsthm, amsfonts}
 \usepackage{subfiles, bm, hyperref, graphicx, listings}
 \usepackage{authblk}
+\usepackage{subcaption}
 
 % my cmd
 %%%%%%%%%%%%%%%%
@@ -49,7 +50,11 @@
 %%%%%%%%%%%%%%%%
 
 % theorem environments
-\theoremstyle{definition}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{remark}[thm]{Remark}
 % my code style
 %%%%%%%%%%%%%%%%
 % start my commands
@@ -80,36 +85,126 @@ Firstly, we introduce some definitions.
     \centering
     \begin{tabular}{l|l}
         \(K_C\)          & recession cone  to set \(C\) \\
-        \(C^*\)          & polar of cone to set \(C\)   \\
+        \(C^0\)          & polar cone to set \(C\)      \\
+        \(C^*\)          & dual cone to set \(C\)       \\
         \(\mathcal N_C\) & normal cone to set \(C\)     \\
         \(\mathcal R_C\) & radial cone to set \(C\)     \\
         \(\mathcal T_C\) & tangent cone to set \(C\)
     \end{tabular}
     \caption{A summary of convex sets}
 \end{table}
-\begin{definition} The basic convex sets.
+\begin{figure}[h!]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{figs/Polar_cone_illustration.png}
+        \caption{The polar cone of \(C\)}
+        \label{fig:polar-cone}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{figs/Dual_cone_illustration.png}
+        \caption{The dual cone of \(C\)}
+        \label{fig:dual-cone}
+    \end{subfigure}
+    \vskip\baselineskip
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{figs/Normal_cone_illustration.svg.png}
+        \caption{The normal cone of \(C\)}
+        \label{fig:normal-cone}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{figs/recession.png}
+        \caption{The recession cone of \(C\)}
+        \label{fig:recession-cone}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \centering
+        \includegraphics[width=1\linewidth]{figs/Contingent-tangent-and-normal-cone-on-a-non-convex-set-K-R-2_Q640.jpeg}
+        \caption{Another example}
+        \label{fig:recession-cone}
+    \end{subfigure}
+    \caption{Illustration of the cones}
+    \label{fig:cone-illustration}
+\end{figure}
+\begin{defn} The basic convex sets.
 
-    \begin{enumerate}[i]
+    \begin{enumerate}[(i)]
         \item The recession cone \(K_C\) of the set \(C\) is formed by vectors \(h\) such that for any \(x \in C\) and any \(t > 0\) it follows that \(x + t\cdot h \in C\).
+        \item The polar cone,
+              \begin{equation}C^{0}=\left\{y:\langle y, x\rangle \leq 0 \quad \forall x \in C\right\}
+              \end{equation}
+              is the opposite of dual cone.
+        \item The normal cone of \(C\) is,
+              \begin{equation}
+                  \mathcal N_C(x) = \{y: \langle y,  z-x \rangle \le 0, \forall x \in C\}
+              \end{equation}
+        \item The radial cone \(\mathcal R_C(x_0) = \cup_{t>0}\{ t(C - x_0) \}\).
+        \item The tangent cone \(\mathcal T_C(x_0)\) is called the tangent cone to \(C\) at \(x_0\)
     \end{enumerate}
 
-\end{definition}
-\begin{theorem} The theorems for the recession cone.
-    \begin{enumerate}[i]
-        \item The \(K_C\) is convex if \(C\) is convex,
-        \item and is closed if the set C is closed.
+\end{defn}
+\begin{thm} The theorems for the recession cone.
+    \begin{enumerate}[(i)]
+        \item The \(K_C\) is convex if \(C\) is convex, and is closed if the set C is closed.
         \item The convex set C is bounded iff. \(K_C = \{0\}\)
     \end{enumerate}
-\end{theorem}
+\end{thm}
 
-\begin{theorem} The theorems for the recession cone.
-    \begin{enumerate}[i]
-        \item The \(K_C\) is convex if \(C\) is convex,
-        \item and is closed if the set C is closed.
-        \item The convex set C is bounded iff. \(K_C = \{0\}\)
+\begin{remark} The case where \(C\) is a polyhedron.
+    Consider polyhedron \(C = \{x: Ax \le b\}\), based on definition,
+    \begin{itemize}
+        \item The recession cone is \(K_c = \{x: Ax \le 0\}\). Compare to the null space of \(A\), i.e., \(K_c \supseteq \mathbf{Null}(A)\)
+    \end{itemize}
+\end{remark}
+
+\begin{thm}[Farkas Lemma]
+    Consider \(Ax = b\), then either of the following in True:
+    \begin{enumerate}[(i)]
+        \item There exists \(x \ge 0\) such that \(Ax = b\)
+        \item There exists \(y\) such that \(y^TA \ge 0, b^Ty < 0\)
     \end{enumerate}
-\end{theorem}
+\end{thm}
 
+Farkas Lemma is very important in the Linear programming and convex optimization.
+\begin{proof}
+    (0) Method 0, Direct proof.
+    (1) Method 1, using LP duality. But actually, LP duality is derived from Farkas Lemma.
+    (2) Method 2, using Fourier–Motzkin elimination.
+    (3) Method 3, use the separating hyperplane theorem of a convex
+\end{proof}
+
+\begin{thm}[General Farkas Theorem]
+    Let $f, g_{1}, \ldots, g_{m}: R ^{n} \rightarrow R$ be convex functions, $C \subseteq R ^{n}$ a convex set, and let us assume that the Slater condition holds for $g_{1}, \ldots, g_{m}$; i.e., there exists an $\bar{x} \in \operatorname{rel} \operatorname{int} C$ such that $g_{j}(\bar{x})<0, j=1, \ldots$, m. The following two statements are equivalent:
+    \begin{enumerate}[(i)]
+        \item  The system below is not solvable,
+              \begin{align*}
+                  \begin{aligned}
+                      f(x)     & <0                           \\
+                      g_{j}(x) & \leq 0, \quad j=1, \ldots, m \\
+                      x        & \in C
+                  \end{aligned}
+              \end{align*}
+        \item  There are $y_{1}, \ldots, y_{m} \geq 0$ such that
+              \begin{align*}
+                  f(x)+\sum_{i=1}^{m} y_{j} g_{j}(x) \geq 0
+              \end{align*}
+              for all $x \in C$.
+    \end{enumerate}
+\end{thm}
+\begin{proof}
+    To prove this, one consider the set \(\{(u, \bm v): f(x) < u, \bm g(x) \le \bm v\}\), then show that \((0, \bm 0)\) does not in the set by the separating argument.
+\end{proof}
+
+\begin{remark}
+    There are many ways to understand the Farkas lemma and the Farkas theorem. One way to see this is that the Farkas is to answer the question,
+
+    \[g(x) \ge 0 \Rightarrow f(x) \ge 0?\]
+
+    If true, can we do this by linear aggregation?
+\end{remark}
 
 \section{Two-Stage Problems}
 
@@ -126,15 +221,16 @@ Firstly, we introduce some definitions.
         \mathcal Q (x) & = \ex Q(x, \bxi)                                \\
                        & \bxi(\omega)    = (T, W, h )(\omega)            \\
                        & T(\bo) x+W(\bo) y=h(\bo), y \geq 0, \forall \bo \\
-        Q(x, \bxi)     & = \min_{y \in \mathcal Y} q^T y                 \\
+        Q(x, \bxi)     & = \min_{y \in \mathcal Y} q^T y
     \end{align*}
 
-    \paragraph{Remark}
-    \begin{itemize}
-        \item Assume random variable \(\bo \) living on some probability space, \((\Omega,\mathcal F, P)\)
-        \item The first stage variable \(x\) is made before a realization of \(\bxi\), i.e., the ``here-and-now'' ones.
-        \item The second stage variable \(y\), to be precise, should be \(\bm y(\omega)\) that actually depends on \(\bo\)
-    \end{itemize}
+    \begin{remark}
+        \begin{itemize}
+            \item Assume random variable \(\bo \) living on some probability space, \((\Omega,\mathcal F, P)\)
+            \item The first stage variable \(x\) is made before a realization of \(\bxi\), i.e., the ``here-and-now'' ones.
+            \item The second stage variable \(y\), to be precise, should be \(\bm y(\omega)\) that actually depends on \(\bo\)
+        \end{itemize}
+    \end{remark}
 \end{frame}
 \begin{frame}[allowframebreaks]{Analysis on the value function}
 
