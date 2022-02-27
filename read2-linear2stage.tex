@@ -1,0 +1,165 @@
+\documentclass[a4pper,11pt]{article}
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[usenames]{color}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{float}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}{Definition}[section]
+\newtheorem{prop}[thm]{Proposition}
+\title{Notes on Stochastic Programming}
+\author{Jingyuan Yang, Chuwen Zhang\\ Stochastic Programming Reading Group}
+\begin{document}
+\maketitle
+
+\section{Mathematical Background}
+\subsection{Functions}
+\begin{defn}
+An extended real valued function $f: \mathbb R^n \to \bar {\mathbb R}$ is \textit{proper} if $f(x)>-\infty$ for all $x\in \mathbb R^n$ and its domain, dom $f$, is nonempty.
+\end{defn}
+\begin{defn}
+An extended real valued function $f: \mathbb R^n \to \bar {\mathbb R}$ is lower semicontinuous if at every point $x_0\in \mathbb R^n$, $f(x_0)\leq \lim \inf_{x\to x_0} f(x)$.
+\end{defn}
+$f$ is lower semicontinuous iff its epigraph is a closed subset of $\mathbb R^{n+1}$.
+\begin{defn}
+An extended real valued function $f: \mathbb R^n \to \bar {\mathbb R}$ is polyhedral if it is proper convex and lower semicontinuous, its domain is a convex closed polyhedron, and $f(\cdot)$ is piecewise linear on its domain.
+\end{defn}
+\begin{defn}
+We refer $\mathscr G$ which is a mapping from $\Omega$ into the set of subsets of $\mathbb R^n$ as a multifunction.
+\end{defn}
+\begin{defn}
+The function $F(x,\omega)$ is random lower semicontinuous if the associated epigraphical multifunction $\omega \mapsto \text{epi} \ F(\cdot,\omega)$ is closed valued and measurable.
+\end{defn}
+\begin{thm}
+\label{thm-1}
+Let $F: \mathbb R^n \times \Omega \to \bar {\mathbb R}$ be a random lower semicontinuous function. Then the optimal value function $v(\omega)$ and the optimal solution multifunction $X^*(\omega)$ are both measurable.
+\end{thm}
+\section{Linear Two-Stage Problems}
+\subsection{Basic Properties}
+We discuss two-stage stochastic linear programming problems of the form
+\begin{equation}
+\label{first}
+\begin{array}{ll}
+\min_{x} &c^Tx+\mathbb E[Q(x,\xi)]\\
+\text{s.t.} &Ax=b, x\geq 0,
+\end{array}
+\end{equation}
+where $Q(x,\xi)$ is the optimal value of the second-stage problem
+\begin{equation}
+\begin{array}{ll}
+\min_y &q^Ty\\
+\text{s.t.}& Tx+Wy=hy, y\geq 0.
+\label{second-stage}
+\end{array}
+\end{equation}
+The dual problem of problem \eqref{second-stage} can be written in the form
+\begin{equation}
+\begin{array}{ll}
+\max_\pi &\pi^T(h-Tx)\\
+\text{s.t.}& W^T\pi \leq q.
+\label{dual}
+\end{array}
+\end{equation}
+We define
+$$
+s_q(\chi)\triangleq \inf\{q^Ty: Wy=\chi,y\geq 0\}.
+$$
+Clearly, $Q(x,\xi)=s_q(h-Tx)$. In addition, by duality theory,
+$$
+s_q(\chi)=\sup_{\pi\in \Pi(q)}\pi^T\chi,
+$$
+where $\Pi(q)\triangleq\{\pi:W^T\pi\leq q\}$.
+\begin{prop} For any given $\xi$, $Q(\cdot,\xi)$ is convex. Moreover, if $\{\pi:W^T\pi\leq q\}$ is nonempty and problem \eqref{second-stage} is feasible for at least one $x$, then the function $Q(\cdot,\xi)$ is polyhedral.
+\label{prop-1}
+\end{prop}
+\begin{prop}
+Suppose that for given $x=x_0$ and $\xi\in \Xi$, the value $Q(x_0,\xi)$ is finite. Then $Q(\cdot,\xi)$ is subdifferentiable at $x_0$ and
+$$
+\partial Q(x_0,\xi)=-T^T\mathfrak D(x_0,\xi),
+$$
+where $\mathfrak D(x_0,\xi)\triangleq \text{arg}\max_{\pi\in \Pi(q)}\pi^T(h-Tx)$ is the set of optimal solutions of the dual problem \eqref{dual}.
+\end{prop}
+\subsubsection{The domain of $s_q(\chi)$}
+The \textit {positive hull} of a matrix $W$ is defined as 
+$$\text{pos} \ W\triangleq \{\chi:\chi=Wy, y\geq0\}.$$
+The recession cone of $\Pi(q)$ is equal to 
+$$\Pi_0\triangleq \{\pi:W^T\pi\leq 0\}.$$
+Denote the polar cone to $\Pi_0$ as $\Pi_0^*$.
+We have
+$$\text{dom} \ s_q=\text{pos}\ W=\Pi_0^*.$$
+
+\subsection{The Expected Recourse Cost}
+$$\phi(x)\triangleq \mathbb E[Q(x,\xi)].$$
+With discrete distribution of $\xi$, if for at least one scenario, the corresponding second-stage problem is infeasible, $\phi(x)$ is $+\infty$.
+
+To ensure that $\phi(x)$ is well defined, we have to verify two conditions:
+\begin{enumerate}
+\item $Q(x,\cdot)$ is measurable [followed by Theorem \ref{thm-1}];
+\item either $\mathbb E[Q(x,\xi)_+]$ or $\mathbb E[(-Q(x,\xi))_+]$  is finite.
+\end{enumerate}
+\begin{prop}
+Suppose that the recourse is fixed and 
+$$\mathbb E[||q||||h||]<+\infty \ \text{and} \ \mathbb E[||q||||T||]<+\infty.$$
+Consider a point $x\in \mathbb R^n$. Then $\mathbb E[Q(x,\xi)_+]$ is finite iff $h-Tx\in \text{pos}\ W$ holds w.p. 1.
+\end{prop}
+\paragraph{Proof.} By Hoffman's lemma.\\
+
+Moreover, if the recourse is complete, $\phi(\cdot)$ is well deﬁned and is less than $+\infty$. Since the function $\phi(\cdot)$ is convex, we have that if $\phi(\cdot)$ is ﬁnite valued in at least one point, then $\phi(\cdot)$ is ﬁnite valued on the entire space $\mathbb R^n$.
+\begin{prop}
+Suppose that the probability distribution of $\xi$ has finite support $\Xi=\{\xi_1,\dots, \xi_K\}$ and $\phi(\cdot)$ has a finite value in at least one point $\bar \xi\in \mathbb R^n$. Then the function $\phi(\cdot)$ is polyhedral, and for any $\xi_0\in \text{dom} \ \phi$,
+$$\partial \phi(x_0)=\sum_{k}p_k\partial Q(x_0,\xi_K).$$ 
+\end{prop}
+\paragraph{Proof.} By Proposition \ref{prop-1}.
+\paragraph{\textit{Remark.}} $\phi$ is differentiable at $x_0$ iff for every $\xi_k$, the corresponding second-stage dual problem has a unique optimal solution.
+
+\begin{prop}
+Suppose that the expectation function $\phi(\cdot)$ is proper and its domain has a nonempty interior. Then for any $x_0\in \text{dom}\ phi,$,
+$$\partial \phi(x_0)=-\mathbb E[T^T\mathfrak D(x_0,\xi)]+\mathcal N_{\text{dom}\ \phi} (x_0),$$
+where
+$$\mathfrak D(x_0,\xi) \triangleq \text{arg}\max_{\pi\in \Pi(q)}\pi^T(h-Tx).$$
+Moreover, $\phi$ is differentiable at $x_0$ iff $x_0$ belongs to the interior of $\text{dom} \ \phi$ and the set $\mathfrak D(x_0,\xi)$ is a singleton w.p. 1.
+\end{prop}
+\begin{prop}
+Suppose that (i) the recourse is ﬁxed, (ii)for a.e. $q$ the set $\Pi(q)$ is nonempty, (iii) condition $\mathbb E[||q||||h||]<+\infty \ \text{and} \ \mathbb E[||q||||T||]<+\infty$ holds, (iv) the conditional distribution of $h$, given $(T,q)$ is absolutely continuous for almost all $(T,q)$. Then $\phi$ is continuously differentiable on the interior of its domain.
+\end{prop}
+In the case of a continuous distribution of $\xi$, the expectation operator smoothes the piecewise linear function $Q(\cdot, \xi)$.
+
+\begin{thm}
+Let $\bar x$ be a feasible solution of problem \eqref{first}. Then $\bar x$ is an optimal solution iff there exist $\pi_k \in\mathfrak D(\bar x,\xi_k), k=1,\dots, K$, and $\mu\in \mathbb R^m$ such that
+\begin{equation}
+\begin{aligned}
+\sum_{k} p_kT_k^T\pi_k+A^T\mu\leq c 
+\\
+\bar x^T(c-\sum_{k} p_kT_k^T\pi_k-A^T\mu)=0.
+\end{aligned}
+\end{equation}
+\end{thm}
+
+If we deal with general distributions of the problem’s data, additional conditions are needed to ensure the subdifferentiability of the expected recourse cost and the existence of Lagrange multipliers.
+\begin{thm}
+Let $\bar x$ be a feasible solution of problem \eqref{first}. Suppose that the expected recourse cost function $\phi(\cdot)$ is proper, $\text{int(dom}\ \phi) \cap X$ is nonempty, and $\mathcal N_{\text{dom} \ \phi}  (\bar x) \subset \mathcal N_X (\bar x)$. Then $\bar x$ is an optimal solution iff there exist a measurable function $\pi(\omega)\in \mathfrak (x,\xi(\omega))$ , and a vector $\mu\in \mathbb R^m$ such that
+\begin{equation}
+\begin{aligned}
+\mathbb E[T^T\pi]+A^T\mu\leq c
+\\
+\bar x^T(c-\mathbb E[T^T\pi]-A^T\mu)=0.
+\end{aligned}
+\end{equation}
+\end{thm}
+
+The assumptions can be substituted by i) the recourse is ﬁxed, (ii)for a.e. $q$ the set $\Pi(q)$ is nonempty, (iii) condition $\mathbb E[||q||||h||]<+\infty \ \text{and} \ \mathbb E[||q||||T||]<+\infty$ holds and $T$ is deterministic.
+\end{document}
+
