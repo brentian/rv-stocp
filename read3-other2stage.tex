@@ -1,0 +1,189 @@
+%%%%%%%%%%%%%%%%
+% switch from arc to beamer
+%%%%%%%%%%%%%%%%
+\PassOptionsToClass{a4paper,10pt}{article} % for article mode 
+\PassOptionsToClass{aspectratio=1610,10pt}{beamer} % for beamer, handout, trans modes
+\newcommand*{\BeamerswitchSpawn}[1]{ 
+\ShellEscape{... -jobname=\jobname#1 \jobname} %
+}
+\documentclass{beamerswitch}
+\mode<article>{
+    \usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+}
+\mode<presentation>{
+    \usefonttheme[onlymath]{serif}
+}
+
+\usepackage{amsmath, amsthm, amsfonts}
+\usepackage{subfiles, bm, hyperref, graphicx, listings}
+\usepackage{authblk}
+\usepackage{subcaption}
+\usepackage{xcolor}
+% my cmd
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\newcommand{\lm}{\lambda_\textrm{max}}
+\newcommand{\trace}{\mathbf{trace}}
+\newcommand{\diag}{\mathbf{diag}}
+\newcommand{\model}[1]{(\textbf{#1})}
+\newcommand{\mx}{\mathbf{\max}\;}
+\newcommand{\mn}{\mathbf{\min}\;}
+\newcommand{\st}{\mathrm{s.t.\;}}
+\newcommand{\ex}{\mathbb E}
+\newcommand{\dx}{\;\bm dx}
+\newcommand{\pr}{\mathbb P}
+\newcommand{\id}{\mathbb I}
+\newcommand{\bp}{\mathbb P}
+\newcommand{\be}{\mathbb E}
+\newcommand{\bi}{\mathbb I}
+\newcommand{\bxi}{\bm \xi}
+\newcommand{\bo}{\bm \omega}
+\newcommand{\va}{\mathbf{Var}}
+\newcommand{\dif}{\mathbf{d}}
+\newcommand{\minp}[2]{\min\{#1, #2\}}
+\newcommand{\intp}{\mathbf{int}}
+\newcommand{\apex}{\mathbf{apex}}
+\newcommand{\conv}{\mathbf{conv}}
+%%%%%%%%%%%%%%%%
+% finish my commands
+%%%%%%%%%%%%%%%%
+
+% theorem environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{remark}[thm]{Remark}
+% my code style
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\lstdefinestyle{codestyle}{
+    basicstyle=\ttfamily\footnotesize,
+    tabsize=2
+    \scriptsize
+}
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+
+\maketitle
+\section{Mathematical Background}
+
+This week we introduce the basics for convex functions, differentiation, and so on.
+
+\emph{\textcolor{red}{See the hand written notes.}}
+
+\begin{thm}[\cite{rockafellar_variational_2009} Theorem 6.12, basic first-order conditions for optimality] Consider a problem of minimizing a differentiable function \(f_{0}\) over a set \(C \subset R ^{n} . A\) necessary condition for \(\bar{x}\) to be locally optimal is
+    \begin{align*}
+        \left\langle\nabla f_{0}(\bar{x}), w\right\rangle \geq 0 \text { for all } w \in T_{C}(\bar{x}), \quad 6(10)
+    \end{align*}
+    which is the same as \(-\nabla f_{0}(\bar{x}) \in \widehat{N}_{C}(\bar{x})\) and implies
+    \begin{align*}
+        -\nabla f_{0}(\bar{x}) \in N_{C}(\bar{x}), \quad \text { or } \nabla f_{0}(\bar{x})+N_{C}(\bar{x}) \ni 0 . \quad 6(11)
+    \end{align*}
+    When \(C\) is convex, these tangent and normal cone conditions are equivalent and can be written also in the form
+    \begin{align*}
+        \left\langle\nabla f_{0}(\bar{x}), x-\bar{x}\right\rangle \geq 0 \text { for all } x \in C,
+    \end{align*}
+    which means that the linearized function \(l(x):=f_{0}(\bar{x})+\left\langle\nabla f_{0}(\bar{x}), x-\bar{x}\right\rangle\) achieves its minimum over \(C\) at \(\bar{x}\). When \(f_{0}\) too is convex, the equivalent conditions are sufficient for \(\bar{x}\) to be globally optimal.
+\end{thm}
+
+\section{Two-stage Problems}
+
+When talk about the two-stage problems, we basically follow an analytic routine:
+
+\begin{enumerate}
+    \item The value function \(Q(x, \xi)\): differentiation calculus, completeness.
+    \item The completeness of recourse contributes to existence of the \emph{cost-to-go function}, i.e., the expectation of \(Q: \phi(\cdot) = \ex(Q(\cdot, \xi))\)
+    \item The existence of \(\phi\) is essentially about an integral being finite
+    \item In the discrete case, we need for any \(\xi\) the recourse problem is feasible: the dual is bounded.
+    \item In the continuous case, more technical conditions are needed. In accordance with the case of discrete distribution, the recourse problem should be feasible a.e.
+    \item With that being said, we could finally discuss the differentiation (first-order condition) of \(\phi\) which is essential to optimality conditions.
+\end{enumerate}
+
+
+\subsection{Polyhedral Two-Stage Problems}
+\begin{defn} A Two-Stage Problems is called polyhedral if it can be written as follows,
+    \begin{align*}
+        f_{1}(x)= \begin{cases}\max _{1 \leq j \leq J_{1}} \alpha_{j}+c_{j}^{\top} x & \text { if } a_{k}^{\top} x \leq b_{k}, \quad k=1, \ldots, K_{1} \\ +\infty & \text { otherwise }\end{cases}
+    \end{align*}
+    where \(f_1\) is the first stage problem. Second stage problem \(f_2\) can written as
+    \begin{align*}
+        f_{2}(y, \omega)= \begin{cases}\max _{1 \leq j \leq J_{2}} \gamma_{j}(\omega)+q_{j}(\omega)^{\top} y & \text { if } d_{k}(\omega)^{\top} y \leq r_{k}(\omega), \quad k=1, \ldots, K_{2} \\ +\infty & \text { otherwise }\end{cases}
+    \end{align*}
+    almost everywhere.
+\end{defn}
+
+We mark the preliminary facts: if the problem is polyhedral, it can be rewritten to a linear problem.
+
+
+\begin{thm}[Differentiation of value function]
+    The differentiation conclusions for \(Q\) holds just like the linear case. That is,
+    \begin{equation}
+        \partial Q(\cdot, \omega) = - T^T \mathfrak D(x, w)
+    \end{equation}
+    where \(\mathfrak D\) is the optimal dual solutions.
+\end{thm}
+
+\begin{thm}[Differentiation of cost-to-go function]
+    Similar results to those of linear models.
+
+    For discrete distributions:
+    \begin{equation}
+        \partial \phi\left(x_{0}\right)=\sum_{k=1}^{K} p_{k} \partial Q\left(x_{0}, \omega_{k}\right)
+    \end{equation}
+
+    For continuous distributions:
+    \begin{equation}\label{eq.cont.diff}
+        \partial \phi\left(x_{0}\right)=- \ex \left[T^{\top} \mathfrak D \left(x_{0}, \omega\right)\right]+ \mathcal N_{\text {dom} \phi}\left(x_{0}\right)
+    \end{equation}
+\end{thm}
+
+For continuous case we should be more careful, \eqref{eq.cont.diff} is true for free. We omit the technical details here.
+
+We now consider the optimal condition for two-stage problems. Since the problem is convex, the first-order conditions suffice:
+
+\begin{equation}
+    0 \in \partial f_1(\cdot) + \partial \phi(\cdot)
+\end{equation}
+
+The above equation directly reduces to the discrete and continuous case analyzed above.
+
+\subsection{General Problems \and Convex Problems}
+The results can be \emph{conjectured} like polyhedral problems. We will revisit them later.
+
+\section{Nonanticipativity}
+
+It can be shown the two-stage problem without \emph{here-and-now} decision can be written as,
+\begin{equation}
+    \underset{x_{1}, \ldots, x_{K}}{\min} \sum_{k=1}^{K} p_{k} F\left(x_{k}, \omega_{k}\right) \text { subject to } x_{k} \in X, k=1, \ldots, K \text {. }
+\end{equation}
+
+with \(x_k = x, k = 1, ..., K\) we have the \textcolor{red}{equivalent} problem. This allows a natural decomposition of scenarios \(w_1, ..., w_k\).
+
+The anticipativity constraint can be described in two alternatives,
+
+\begin{align*}
+     & I \cdot x = x_0                    \\
+     & P \cdot x = x, P = [p^T, ..., p^T]
+\end{align*}
+
+using the second equation and let \(\lambda\) be the Lagrangian multipliers.
+
+\begin{align*}
+    L = p^T F + \lambda^T(I-P)x
+\end{align*}
+
+We can define the dual function, \(D(\lambda) = \min_x L\), if we have strong duality, then we optimize over \(\lambda\).
+
+\begin{frame}[allowframebreaks]
+    \bibliography{robust}
+    \bibliographystyle{apalike}
+\end{frame}
+\end{document}
