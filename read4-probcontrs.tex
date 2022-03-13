@@ -1,0 +1,199 @@
+\documentclass[a4pper,11pt]{article}
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[usenames]{color}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{authblk}
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}{Definition}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{prop}[thm]{Proposition}
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+\maketitle
+
+\section{Mathematical Background}
+\subsection{Functions}
+\begin{defn}
+Function $f$ is called Clarke-regular at $\bar x$ if $f$ is directionally differentiable at $\bar x$ and $f'(\bar x,\cdot)=f^\circ (\bar x,\cdot)$.
+\end{defn}
+Any convex function $f$ is Clarke-regular and its Clarke generalized gradient $\partial^\circ f(\bar x)$ coincides with the respective subdifferential in the sense of convex analysis.
+\section{Optimization Models with Probabilistic Constraints}
+\begin{equation}
+    \label{4.1}
+    \begin{array}{ll}
+        \min_x   & c(x) \\
+        \text{s.t.} & Pr\{g_j(x,Z)\leq 0,j\in \mathcal J\}\geq p,\\
+        & x\in \mathcal X.
+    \end{array}
+\end{equation}
+Here $g_j:\mathbb R^n\times \mathbb R^s\to \mathbb R$. The event $A(x)=\{g_j(x,Z)\leq 0,j\in \mathcal J\}$ depends on $x$, and its probability $Pr\{A(x)\}$ is calculated with respect to the probability distribution $P_Z$.
+
+This kind of constraints is appropriate whenever high uncertainty is involved and reliability is a central issue, while constraints on the expected value may not be sufficient. Also note that $c(x)$ can be $\mathbb E[f(x,Z)]$.
+
+The function $f(\cdot,Z)$ is continuous at $x_0$ w.p. 1 and there exists an integrable random variable $Z$ such that $|f (x, Z(\omega))|\leq  Z(\omega)$ for $P$-almost every $\omega\in \Omega$ and for all $x$ in a neighborhood of $x_0$, then for all $x$ in a neighborhood of $x_0$ the expected value function $c(x)$ is well deﬁned and continuous at $x_0$. Furthermore, convexity of $f (\cdot, Z)$ for a.e. $Z$ implies convexity of the expectation function $c(x)$.
+
+\begin{defn}
+    A random variable $X$ dominates in the $k$th order a random variable $Y$ (denoted $X\succeq_{(k)} Y$) if 
+    $$F_X^{(k)}(\eta)\leq F_Y^{(k)}(\eta), \qquad \eta \in \mathbb R,$$
+    where $F_X^{(k)}(\eta) =\int^\eta_{-\infty} F_X^{(k-1)}(t)dt\quad \text{for }k=2,3,4,\cdots .$
+\end{defn}
+The higher order distribution functions (with $k=2,3,4,\cdots$) are continuous, nonnegative, nondecreasing, and convex as well.
+There is a kind of problem, called \textit{a stochastic optimization problem with a stochastic dominance constraint of order $k$}:
+\begin{equation}
+    \label{4.1}
+    \begin{array}{ll}
+        \min_x   & c(x) \\
+        \text{s.t.} & F^{(k)}_{g(x,Z)}(\eta)\leq F^{(k)}_{Y}(\eta),\qquad \eta\in  [a,b],\\
+        & x\in \mathcal X.
+    \end{array}
+\end{equation}
+\paragraph{Example (Portfolio Selection Problem)} The Value-at-Risk constraint $Pr\{\sum_{i=1}^n R_ix_i\leq \eta\}\leq p_\eta$ can be written as $\sum_{i=1}^n R_ix_i\succeq_{(1)}Y$. A second order dominance constraint equals to $\mathbb E[(\eta-\sum_{i=1}^n R_ix_i)_+]\leq \mathbb E[(\eta-Y)_+], \quad \eta\in \mathbb R$ also be viewed as a continuum of Average Value-at-Risk (AV@R) constraints.
+
+\subsection{Convexity in Probabilistic Optimization}
+\paragraph{Main Concerns}
+\begin{enumerate}
+\item Convexity of the feasible set
+\item Continuity and differentiability of the constraint functions
+\end{enumerate}
+\begin{defn}
+A nonnegative function $f(x)$ defined on a convex set $\Omega$ is said to be $\alpha$-concave, where $\alpha \in[-\infty,\infty]$, if for all $x,y\in \Omega$ and all $\lambda\in[0,1]$, the following inequality holds true:
+$$f(\lambda x+(1-\lambda y))\geq m_\alpha (f(x),f(y),\lambda),$$
+where $m_\alpha (f(x),f(y),\lambda)=0$ if ab=0, and if $a>0,b>0, 0\leq \lambda \leq 1$,then 
+$$
+m_\alpha (f(x),f(y),\lambda)\begin{cases}
+a^\lambda b^{1-\lambda} & \text{if } \alpha=0,\\
+\max\{a,b\} & \text{if } \alpha=\infty,\\
+\min\{a,b\} & \text{if } \alpha=-\infty,\\
+(\lambda a^\alpha+(1-\lambda) b^\alpha)^{1/\alpha}&\text{o/w}.
+\end{cases}
+$$
+\end{defn}
+\paragraph{Common use}
+\begin{enumerate}
+\item \textit{log-concave}: $\alpha=0$
+\item \textit{concave}: $\alpha=1$
+\item \textit{quasi-concave}: $\alpha=-\infty$
+\end{enumerate}
+
+\begin{lemma}
+$m_\alpha(a,b,\lambda)$ is nondecreasing and continuous of $\alpha$.
+\end{lemma}
+
+\paragraph{Definition Chain} $\alpha$-concave function $\to$ $\alpha$-concave probability measure $P$ $\to$ a random vector $Z$ has an $\alpha$-concave distribution $\to$ $\alpha$-concave distribution function $F$ $\to$ $\alpha$-concave sequence $p_k$
+
+\paragraph{Calculus rules for $\alpha$-concave functions}
+\begin{enumerate}
+\item $h(x)=f(x)+g(x)$ is $\gamma$-concave with $\gamma=\min\{\alpha,\beta\}$ if $f$ is $\alpha$-concave and $g$ is $\beta$-concave.
+\item $g\circ f$ is $\alpha$-concave if $f$ is concave defined on a convex set and $g$ is nonnegative nondecreasing $\alpha-$concave.
+\item $inf_{y\in Y}f(x,y)$ is $\alpha$-concave on $X$ if $f(\cdot,y)$ is $\alpha$-concave on the convex set $X$ for all $y$.
+\item $f(x)=\prod_{i=1}^m x_i^{\alpha_i}$ is concave.
+\item $\prod_{i=1}^m f_i(x_i)$ is $\gamma$-concave with $\gamma=(\sum_{i=1}^m\alpha_i)^{-1}$.
+\item $det(A)$ is $1/n$-concave if $A$ is a symmetric positive deﬁnite matrix of size $n\times n$.
+\item $Y=TZ$ has an $\alpha$-concave probability distribution if random vector $Z$ has an $\alpha$-concave probability distribution.
+\item $Y=\lceil Z\rceil$ is $\alpha$-concave if $Z$ is $\alpha$-concave.
+\end{enumerate}
+\begin{thm}
+If $f$ is $\alpha$-concave $(a\in \mathbb R)$ on some open set $U$, and $f(x)>0$ for all $x\in U$, then $f(x)$ is locally Lipschitz continuous, directionally differentiable, and Clarke-regular.
+\end{thm}
+\begin{thm}
+Let $f$ be an $\alpha$-concave function and set $X\subset \text{dompos} \ f$ be convex. Then all the stationary points of $f$ on $X$ are global maxima and the set of global maxima of $f$ on $X$ is convex.
+\end{thm}
+
+\begin{thm}
+Let the function $g_j$ be quasi-concave. If $Z$ is a random vector that has an $\alpha$-concave probability distribution, then the function
+$$G(x)=P\{g_j(x,Z)\geq 0,j\in \mathcal J\}$$
+is $\alpha$-concave on the set $D=\{x :\exists z \text{ such that } g_j(x,z)\geq 0,j\in \mathcal J\}$.
+\end{thm}
+\begin{corollary} Assume that the functions $g_j(\cdot,\cdot)$ are quasi-concave jointly in both arguments and that $Z$ is a random variable that has an $\alpha$-concave probability distribution. Then the following set is convex and closed
+$$X_0=\{x: P(g_i(x,Z) \geq 0, i=1,\cdots,m) \geq p\}.$$ 
+\end{corollary}
+
+\paragraph{Convexity}
+\begin{enumerate}
+\item A separable mapping $g$ when the random quantities appear only on the right-hand side of the inequalities: $X_0=\{x: P(g(x)\geq Z) \geq p\}$ is convex if $g_i$ is concave, and one-dimensionnal marginal distribution functions $F_{Z_i}, i=1,\cdots,m$ are $\alpha_i$-concave.
+\item The set determined by the first order stochastic dominance constraint is convex and closed.
+\item Tffine in each argument function: $X_0=\{x: P\{x^Ta_i\leq b_i(Z),i=1,\cdot, m\}\geq 0\}$ is convex if $b_i(\cdot)$ are quasi-concave functions and $Z$ has a quasi-concave probability distribution function.
+\item Nonseparable $g_i$: $X_p=\{x: P_{Z_i}\{x^TZ_i\leq b_i \}\geq p_i,i=1,\cdot,m\}$ is convex when $Z_i$ has a log-concave probability distribution, which is symmetric around some point $\mu_i\in \mathbb R^n$.
+\item The sets constrained by first and second order stochastic dominance $\cdots$
+\end{enumerate}
+
+\subsection{Separable Probabilistic Constraints}
+\begin{equation}
+    \label{4.1}
+    \begin{array}{ll}
+        \min_x   & c(x) \\
+        \text{s.t.} & Pr\{g(x)\geq Z\}\geq p,\\
+        & x\in \mathcal X.
+    \end{array}
+\end{equation}
+\paragraph{Continuity and Differentiability Properties of Distribution Functions}
+$F_Z$ is
+\begin{enumerate}
+\item locally Lipschitz continuous if all one-dimensional marginal distribution functions of an $s$-dimensional random vector $Z$ are locally Lipschitz continuous.\\
+\item continuously differentiable if $P_Z$ has a continuous density $\theta(\cdot)$ and that all one-dimensional marginal distribution functions are continuous as well.\\
+\end{enumerate}
+\begin{equation}
+    \label{4.1}
+    \begin{array}{ll}
+        \min_x   & c(x) \\
+        \text{s.t.} & g(x)\in \mathcal Z_p,\\
+        & x\in \mathcal X.
+    \end{array}
+\end{equation}
+where $\mathcal Z_p=\{z:F_Z(z)\geq p\}$.
+\paragraph{$p$-Efficient Points}
+
+Under the structure of the probabilistically constrained set for a discrete random variable $Z$, $\mathcal Z_p$ can be written as 
+$$\mathcal Z_p=\{y\in \mathbb R^m:y\geq z\geq \sum\lambda_j v^j,\sum \lambda_j=1,\lambda_j\geq 0, z\in \mathbb Z^m\}$$.
+\paragraph{Optimal Conditions and Duality Theory}
+We split variables and consider the following formulation of the problem:
+\begin{equation}
+    \label{4.1}
+    \begin{array}{ll}
+        \min_x   & c(x) \\
+        \text{s.t.} & g(x)\geq z,\\
+        & x\in \mathcal X,\\
+        & z\in \mathcal Z_p.
+    \end{array}
+\end{equation}
+The dual functional has the form
+$$
+\Phi(u)=\text{inf}_{x,z\in \mathcal X\times \mathcal Z_p} L(x,z,u)=h(u)+d(u),
+$$
+where
+$$
+\begin{aligned}
+h(u)&=\text{inf}\{c(x)-u^Tg(x):x\in\mathcal X\},\\
+d(u)&=\text{inf}\{u^Tz:z\in \mathcal Z_p\}.
+\end{aligned}
+$$
+We have $d(u)=\text{inf}\{u^Tz:z\in \text{conv} \mathcal Z_p\}$.
+After analyzing $d(u)$ and $h(u)$ respectively, we have the following properties.
+\begin{enumerate}
+\item The necessary and sufficient optimality conditions.\\
+\item Duality result.\\
+\item Specific necessary and sufficient optimality conditions for discrete distribution and linear constraints.\\
+\end{enumerate}
+\end{document}
+
