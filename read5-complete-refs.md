@@ -1,3 +1,4 @@
+```
 Ahmed, S., Luedtke, J., Song, Y., & Xie, W. (2017). Nonanticipative duality, relaxations, and formulations for chance-constrained stochastic programs. Mathematical Programming, 162(1), 51–81. https://doi.org/10.1007/s10107-016-1029-z
 Ahmed, S., & Xie, W. (2018). Relaxations and approximations of chance constraints under finite distributions. Mathematical Programming. https://doi.org/10.1007/s10107-018-1295-z
 Back Matter. (n.d.). In Probabilistic and Randomized Methods for Design under Uncertainty.
@@ -17,3 +18,4 @@ Xie, W., & Ahmed, S. (2018c). On deterministic reformulations of distributionall
 Xie, W., & Ahmed, S. (2020). Bicriteria Approximation of Chance-Constrained Covering Problems. Operations Research. https://doi.org/10.1287/opre.2019.1866
 Xie, W., Ahmed, S., & Jiang, R. (2019). Optimized Bonferroni approximations of distributionally robust joint chance constraints. Mathematical Programming. https://doi.org/10.1007/s10107-019-01442-8
 Xie, W., Ouyang, Y., & Wong, S. C. (2016). Reliable location-routing design under probabilistic facility disruptions. Transportation Science, 50(3), 1128–1138.
+```
