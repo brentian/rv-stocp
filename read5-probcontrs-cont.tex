@@ -1,0 +1,196 @@
+\documentclass[a4pper,11pt]{article}
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[usenames]{color}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{authblk}
+
+% my cmd
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\newcommand{\lm}{\lambda_\textrm{max}}
+\newcommand{\trace}{\mathbf{trace}}
+\newcommand{\diag}{\mathbf{diag}}
+\newcommand{\model}[1]{(\textbf{#1})}
+\newcommand{\mx}{\mathbf{\max}\;}
+\newcommand{\mn}{\mathbf{\min}\;}
+\newcommand{\st}{\mathrm{s.t.\;}}
+\newcommand{\ex}{\mathbb E}
+\newcommand{\dx}{\;\bm dx}
+\newcommand{\pr}{\mathbb P}
+\newcommand{\id}{\mathbb I}
+\newcommand{\bp}{\mathbb P}
+\newcommand{\be}{\mathbb E}
+\newcommand{\bi}{\mathbb I}
+\newcommand{\bxi}{\bm \xi}
+\newcommand{\bo}{\bm \omega}
+\newcommand{\va}{\mathbf{Var}}
+\newcommand{\dif}{\mathbf{d}}
+\newcommand{\minp}[2]{\min\{#1, #2\}}
+\newcommand{\intp}{\mathbf{int}}
+\newcommand{\apex}{\mathbf{apex}}
+\newcommand{\conv}{\mathbf{conv}}
+%%%%%%%%%%%%%%%%
+% finish my commands
+%%%%%%%%%%%%%%%%
+
+% theorem environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{remark}[thm]{Remark}
+% my code style
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+\maketitle
+
+\section{Overview}
+
+Recall chance constrained SP:
+\begin{align}
+    \min & ~ \mathbb{E}[f(x, Z)]                                       \\
+    \st  & ~ \mathbb{P}\left[g_{j}(x, Z) \leq 0, j \in J\right] \ge p,
+\end{align}
+
+We have some different strategies to deal with this. The above case is called ``joint'' cc. Alternatively, one may have,
+
+\[
+    \mathbb{P}\left[g_{j}(x, Z) \leq 0 \right] \ge p_j, j \in J,
+\]
+
+which is referred to as individuals: when \(|J| = 1\), both reduce to the ``single'' case.
+
+We now introduce some different perspectives on the cc problem.
+\section{Uncertainty Set and Robust Optimization}
+For simplicity assume \(|J| = 1\), follow the principle of RO, one find measurable subsets \(\mathcal Z\) such that \(\pr(Z\in \mathcal Z) \ge p\), then we have,
+\begin{align}
+                                       & \mathcal X = \{x: \mathbb{P}\left[g(x, Z) \leq 0\right] \ge p\}       \\
+    \label{eq.cc.ro}   \Leftrightarrow & ~\{x: g(x, Z) \leq 0, \forall Z\in\mathcal Z, ~\pr(\mathcal Z)\ge p\}
+\end{align}
+
+So in the method of RO, one finds equivalent \(\Leftrightarrow\) or approximation \(\Leftarrow\), often \emph{safe convex approximation}, cf. \eqref{eq.cc.ro} to the original cc.
+
+For uncertainty set \(\mathscr{U}\), we always assume the following approximation
+\begin{align}
+    \mathscr{U} =\big\{\begin{bmatrix}c^{T}    & d \\ A & b \end{bmatrix}
+    =\underbrace{\begin{bmatrix}c_{0}^{T}    & d_{0} \\A_{0} & b_{0}\end{bmatrix}}_{\text { nominal data } D_{0}} %
+    +\sum_{l=1}^{L} \zeta_{l} \underbrace{\begin{bmatrix} c_l^T   & d_l \\  A_{l} & b_{l}\end{bmatrix}}_{\textrm {basic }}; %
+    \zeta \in Z \subset R ^{L}\big\}
+\end{align}
+By assume \((c, A, d, b)^l\) is constant and the uncertainty is captured by the \(\textbf{perturbation set}\) \(\mathscr{Z} \subseteq \mathbb R^L\)
+
+Consider a generic CC,
+\begin{align*}
+    \mx & f(x)                           \\
+    \st & \pr(a^Tx \le b) \ge 1-\epsilon
+\end{align*}
+
+Given \(f\) convex the problem is generally non-convex. Our goal is to find a \(\textbf{safe approximation}\) to CC, for example, a \textcolor{red}{stronger} yet \textcolor{red}{tractable} convex approximation with function \(g\) such that,
+\begin{align}
+    g(x,a,b,\epsilon) \le 0 \Rightarrow & \pr(a^Tx \le b) \ge 1-\epsilon
+\end{align}
+
+Using the PS notation:
+\begin{align}
+                                                        & \pr\left[\sum_i \xi_i (a_i^Tx - b_i) \le b_0 - a_0 ^T x \right] \ge 1-\epsilon \\
+                                                        & \textrm{Let } z_i =  (a_i^Tx - b_i), z_0 = b_0 - a_0 ^T x                      \\
+    \label{eq:ro.cc.basic} \Leftrightarrow \quad        & \pr\left[\sum_i z_i \xi_i \le z_0\right] \ge 1-\epsilon                        \\
+    \label{eq:ro.cc.basic_reverse}\Leftrightarrow \quad & \pr\left[\sum_i z_i \xi_i \ge z_0\right] \le \epsilon
+\end{align}
+
+We continue our discussion with equation \eqref{eq:ro.cc.basic}, \eqref{eq:ro.cc.basic_reverse} in the subsequent sections.
+\subsection{Safe Approximation, Basic Example}
+
+In this section we discuss the case where perturbation is bounded in \([-1, 1]\) with \(0\) mean. We introduce 2 basic theorem to start off.
+
+\begin{thm}\label{tm:ro.cc.1}
+    Let \(z_l, l = 1, \dots, L\) be deterministic coefficients and i.i.d. R.V.s \(\{\xi_i\}_{i=1}^L\) such that
+    \(\ex \xi_i = 0, \xi_i \in [-1, 1], i = 1, \dots, L\), \(\forall \Omega \ge 0\), we have,
+    \begin{equation*}
+        \pr(z^T\xi \ge \Omega \|z\|_2) \le \exp\left(-\frac{\Omega^2}{2}\right)
+    \end{equation*}
+\end{thm}
+
+\begin{thm}\label{tm:ro.cc.hoef}
+    \emph{(Hoeffding's inequality)} Let i.i.d. R.V.s \(\{\xi_i\}_{i=1}^L\) , suppose \(\exists a_i, b_i\) such that \(\pr (\xi - \ex\xi \in [a_i, b_i]) = 1\), let \(s = \xi^T 1\)
+    \begin{align*}
+        \pr(s - \ex s \ge t)   & \le \exp\left(-\frac{2t^2}{\|b-a\|^2}\right)  \\
+        \pr(|s - \ex s| \ge t) & \le 2\exp\left(-\frac{2t^2}{\|b-a\|^2}\right)
+    \end{align*}
+\end{thm}
+
+
+By the above two theorem, we have following corollaries.
+
+\begin{cor} \label{coro:ro.cc.tm1}
+    In the Chance Constraints, if \(\{\xi_i\}_{i=1}^L\) are i.i.d. R.V.s such that
+    \(\ex \xi_i = 0, \xi_i \in [-1, 1], i = 1, \dots, L\). Then if \(z_0 \ge \Omega\sqrt{\sum_iz_i^2}\), we have \(\pr(z^T\xi > z_0) \le \exp(-\Omega^2/2)\doteq \epsilon\)
+\end{cor}
+\begin{proof}
+    \(z_0 \ge \Omega\sqrt{\sum_iz_i^2} \Rightarrow \pr(z^T\xi > z_0) \le \pr(z^T\xi > \sqrt{\sum_iz_i^2}) \le \exp(-\Omega^2/2)\), cf. \ref{tm:ro.cc.1},
+\end{proof}
+
+From Corollary \ref{coro:ro.cc.tm1}, we see how safe approximation is done with perturbation and its partial prior information. The logic is, we construct a safe approximation in a way that the probability in the CCs are parameterized in the robust counterpart. One can derive similar results for \(\xi\) restricted in \(\mathscr L_1, \mathscr L_2, \mathscr L_\infty\) balls.
+
+
+\section{The stochastic dominance}
+
+The first-order stochastic dominance (FSD), is the following,
+\[\pr_A (X \ge x) \ge \pr_B(X\ge x) \Leftrightarrow F_A(x) \le F_B(x)\]
+
+By second-order stochastic dominance (SSD),
+\begin{align}
+    F_{k}(X ; \eta)=\int_{-\infty}^{\eta} F_{k-1}(X ; \alpha) d \alpha \\
+    F_{2}(X ; \eta)=\mathbb{E}\left[(\eta-X)_{+}\right]
+\end{align}
+
+To captalize on FSD or SSD,  we find a \emph{reference variable} Y, for example, in portfolio, set \(Y\) to a benchmark outcome.
+\begin{align}
+     & A_{(1)}(Y)=\left\{X \in \mathcal L_{1}(\Omega, \mathcal F , \pr ): X \succeq_{(1)} Y\right\} \\
+     & A_{(2)}(Y)=\left\{X \in \mathcal L_{1}(\Omega, \mathcal F , \pr ): X \succeq_{(2)} Y\right\}
+\end{align}
+
+It is proved that \(A_{(2)}(\cdot)\) closed and convex in \(L _{1}(\Omega, \mathcal F, \pr )\), and \(A_{(2)}\) is the closed convex hull of \(A_{(1)}\). In general \(A_{(1)}\) is not convex.
+
+In some cases \(A_{(1)}\) can be convex.
+
+See, \cite{dentcheva_optimization_2003}, and follow-ons.
+
+\section{P-Efficient Points}
+
+Should refer to Dentcheva's series of papers for this. For example, starts with \cite{dentcheva_concavity_2000}
+
+\section{Generalized Concavity}
+Should refer to Borell, RJB Wets. This part is related to functional, convex and real analysis. Some of the materials are pretty old.
+
+\section{Sampling and Data-Driven Method}
+Should refer to \cite{nemirovski_convex_2007}
+
+\bibliography{robust}
+\bibliographystyle{apalike}
+\end{document}
+
