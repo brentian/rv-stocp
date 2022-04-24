@@ -1,0 +1,173 @@
+\documentclass[a4pper,10pt]{article}
+\usepackage{lipsum} %This package kust generates Lorem Ipsum filler text. 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[usenames]{color}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{authblk}
+\usepackage{bm}
+\usepackage{calligra}
+% my cmd
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\newcommand{\lm}{\lambda_\textrm{max}}
+\newcommand{\trace}{\mathbf{trace}}
+\newcommand{\diag}{\mathbf{diag}}
+\newcommand{\model}[1]{(\textbf{#1})}
+\newcommand{\mx}{\mathbf{\max}\;}
+\newcommand{\mn}{\mathbf{\min}\;}
+\newcommand{\st}{\mathrm{s.t.\;}}
+\newcommand{\ex}{\mathbb E}
+\newcommand{\dx}{\;\bm dx}
+\newcommand{\pr}{\mathbb P}
+\newcommand{\id}{\mathbb I}
+\newcommand{\bp}{\mathbb P}
+\newcommand{\be}{\mathbb E}
+\newcommand{\bi}{\mathbb I}
+\newcommand{\bxi}{\bm \xi}
+\newcommand{\bo}{\bm \omega}
+\newcommand{\va}{\mathbf{Var}}
+\newcommand{\dif}{\mathbf{d}}
+\newcommand{\minp}[2]{\min\{#1, #2\}}
+\newcommand{\intp}{\mathbf{int}}
+\newcommand{\apex}{\mathbf{apex}}
+\newcommand{\conv}{\mathbf{conv}}
+%%%%%%%%%%%%%%%%
+% finish my commands
+%%%%%%%%%%%%%%%%
+
+% theorem environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{remark}[thm]{Remark}
+% my code style
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+\maketitle
+
+\section{Numerical Methods for MSP}
+
+\subsection{SAA Like Methods}
+
+Sample-Average-Approximation for either two-stage or $N$-stage problem is that:
+
+$$
+	\mn_{x \in X}\left\{\hat{f}_{N}(x):=\frac{1}{N} \sum_{k=1}^{N} F\left(x, \bm\xi^{k}\right)\right\}
+$$
+
+With regularities we know the convergence in the sense of LLN:
+\begin{itemize}
+	\item the optimal value converges to the true: $\vartheta_N \to \vartheta^*$
+	\item the solution converges to the optimal solution in terms of set convergence, i.e.,
+	      $$\mathbb D \left(\hat{S}_{N}, S\right) \rightarrow 0,$$
+	      where $\mathbb D$ is the Hausdorff distance
+\end{itemize}
+
+\subsection{SAA Complexity}
+
+
+
+\begin{lem}
+
+	Suppose $X_N$ is the sample mean of i.i.d $X_1, ...,  X_N$ with mgf $M(\cdot)$
+	$$\pr\left(X_N \geq a\right) \leq e^{-t a} E \left[e^{t Z_{N}}\right]=e^{-t a}[M(t / N)]^{N}, \forall t > 0$$
+
+	which is the Chebyshev inequality, taking log we obtain,
+
+	$$\begin{aligned}
+			 & \frac{1}{N} \ln \left[\pr\left(Z_{N} \geq a\right)\right] \leq-I(a) \\
+			 & I(z) = \sup_t \{ tz - \Lambda(t) \}, \Lambda(t) = \ln M(t)
+		\end{aligned}
+	$$
+\end{lem}
+
+\paragraph{Finite Solution Set}
+Consider $\varepsilon$-optimality set:
+$$S^{\varepsilon}:=\left\{x \in X: f(x) \leq \vartheta^{*}+\varepsilon\right\} \text { and } \hat{S}_{N}^{\varepsilon}:=\left\{x \in X: \hat{f}_{N}(x) \leq \hat{\vartheta}_{N}+\varepsilon\right\}$$
+
+$$\begin{aligned}
+		            & \left\{\hat{S}_{N}^{\delta} \not \subset S^{\varepsilon}\right\}=\bigcup_{x \in X \backslash S^{\varepsilon}} * \bigcap_{y \in X}\left\{\hat{f}_{N}(x) \leq \hat{f}_{N}(y)+\delta\right\}                   \\
+		\Rightarrow & ~\pr\left(\hat{S}_{N}^{\delta} \not \subset S^{\varepsilon}\right) \leq \sum_{x \in X \backslash S^{\varepsilon}} \pr\left(\bigcap_{y \in X}\left\{\hat{f}_{N}(x) \leq \hat{f}_{N}(y)+\delta\right\}\right) \\
+		\Rightarrow & ~\pr\left(\hat{S}_{N}^{\delta} \not \subset S^{\varepsilon}\right) \leq \sum_{x \in X \backslash S^{\varepsilon}} \pr \left\{\hat{Y}_{N}(x) \geq-\delta\right\}                                             \\
+		\Rightarrow & ~		1-\pr\left(\hat{S}_{N}^{\delta} \subset S^{\varepsilon}\right) \leq \sum_{x \in X \backslash S^{\varepsilon}} e^{-N I_{x}(-\delta)}
+	\end{aligned}
+$$
+
+Next assume existence of mgf, by the lemma above we arrive at, Theorem 5.16
+
+$$\begin{gathered}
+		1-\pr\left(\hat{S}_{N}^{\delta} \subset S^{\varepsilon}\right) \leq|X| e^{-N \eta(\delta, \varepsilon)} \\
+		\eta(\delta, \varepsilon):=\min _{x \in X \backslash S^{\varepsilon}} I_{x}(-\delta)
+	\end{gathered}
+$$
+
+and we further assume the mgf is bounded by a constant $\sigma$
+
+$$
+	M_{x}(t) \leq \exp \left(\sigma^{2} t^{2} / 2\right)
+$$
+
+Then we have,
+
+$$
+	1-\pr\left(\hat{S}_{N}^{\delta} \subset S^{\varepsilon}\right) \leq|X| e^{-N(\varepsilon-\delta)^{2} /\left(2 \sigma^{2}\right)}
+$$
+
+which means by setting a confidence level $\alpha$ we know,
+
+$$\pr\left(\hat{S}_{N}^{\delta} \subset S^{\varepsilon}\right) \geq 1-\alpha \Rightarrow N \geq \frac{2 \sigma^{2}}{(\varepsilon-\delta)^{2}} \ln \left(\frac{|X|}{\alpha}\right)$$
+
+
+\paragraph{Interpretation} To approach the \(\varepsilon\)-optimality set, we cannot have a too large \(\delta\), and the required sample-size is almost at a ratio of \(O(\frac{1}{\varepsilon^2})\). And to approach a \(\delta\) solution we may usually have a complexity in the order of \(\delta\). For example, if we kust have a 1-stage problem using something like subgradient method, then for each \(k = 1, ..., N\) each sample \(\bm \xi_k\) needs \(O(\frac{1}{\delta^2})\) so the total number of required iterations could be like $O\left(\frac{1}{\varepsilon^4}\right)$. In some cases we do not have to multiply such terms, for example, it could be $O\left(\frac{1}{\varepsilon^2}\right)$
+
+\paragraph{General Distribution Case*}
+
+\paragraph{Two- and Multi-stage case}
+In the above analysis we assume that value function, i.e., $f(x) =\ex F(x, \bm \xi)$ is an oracle, which obviously is unrealistic in two- and multi-stage problems (dynamic case) where $f(x)$ itself is an approximation task. In general, in the black-box model we arrive at a complexity of $O(\varepsilon^{-2T})$, cf. \citet{shapiro_complexity_2006}, \citet{nemirovski_complexity_2006}. It can be improved when strongly convexity, sharpness, etc., holds.
+
+
+\subsection{Stochastic Approximation}
+
+If the value function is convex \(f(\cdot)\), for example, when the intergrand \(F\) is convex and proper..., we may assume there is an oracle for value and gradient (subgradient) of \(F(\cdot, \bm \xi)\) can be estimated. So we may use stochastic optimization techniques with respect to subgradient-like method by knowing:
+
+$$\partial f = \ex \partial F(\cdot, \bm \xi)$$
+
+Then first-order method naturally becomes a choice, for example, the most simple projected subgradient:
+$$x_{k+1}=\Pi_{X}\left(x_{k}-\gamma_{k} G\left(x_{k}, \xi^{k}\right)\right)$$
+\begin{itemize}
+	\item The complexity should mimic normal SGD, that is, $O\left(\frac{1}{\varepsilon^2}\right)$
+	\item It is natural to extend to mini-batch versions, Nesterov extrapolations, ..., cf. \citet{ghadimi_optimal_2012,ghadimi_optimal_2013,ghadimi_stochastic_2013,ghadimi_accelerated_2016,ghadimi_mini-batch_2016}
+	\item Use other FOM techniques...
+\end{itemize}
+
+
+
+\bibliography{robust}
+\bibliographystyle{plainnat}
+\end{document}
+
