@@ -1,0 +1,188 @@
+\documentclass[a4pper,11pt]{article}
+\usepackage{lipsum} %This package just generates Lorem Ipsum filler text. 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{geometry}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[linesnumbered,ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+\usepackage[usenames]{color}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{dsfont}
+\usepackage{mathrsfs}
+\usepackage{tabu}
+\usepackage{multirow}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{subfigure}
+\usepackage{float}
+\usepackage{authblk}
+\usepackage{bm}
+\usepackage{calligra}
+% my cmd
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\newcommand{\lm}{\lambda_\textrm{max}}
+\newcommand{\trace}{\mathbf{trace}}
+\newcommand{\diag}{\mathbf{diag}}
+\newcommand{\model}[1]{(\textbf{#1})}
+\newcommand{\mx}{\mathbf{\max}\;}
+\newcommand{\mn}{\mathbf{\min}\;}
+\newcommand{\st}{\mathrm{s.t.\;}}
+\newcommand{\ex}{\mathbb E}
+\newcommand{\dx}{\;\bm dx}
+\newcommand{\pr}{\mathbb P}
+\newcommand{\id}{\mathbb I}
+\newcommand{\br}{\mathbb R}
+\newcommand{\bp}{\mathbb P}
+\newcommand{\be}{\mathbb E}
+\newcommand{\bi}{\mathbb I}
+\newcommand{\bxi}{\bm \xi}
+\newcommand{\bo}{\bm \omega}
+\newcommand{\va}{\mathbf{Var}}
+\newcommand{\dif}{\mathbf{d}}
+\newcommand{\minp}[2]{\min\{#1, #2\}}
+\newcommand{\intp}{\mathbf{int}}
+\newcommand{\apex}{\mathbf{apex}}
+\newcommand{\conv}{\mathbf{conv}}
+%%%%%%%%%%%%%%%%
+% finish my commands
+%%%%%%%%%%%%%%%%
+
+% theorem environments
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{defn}[thm]{Definition}
+\newtheorem{prop}[thm]{Proposition}
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{remark}[thm]{Remark}
+% my code style
+%%%%%%%%%%%%%%%%
+% start my commands
+%%%%%%%%%%%%%%%%
+\title{Notes on Stochastic Programming}
+
+\begin{document}
+
+\author[1]{\small Chuwen Zhang}
+\author[1]{\small Jingyuan Yang}
+\affil[1]{\footnotesize Stochastic Programming Reading Group}
+\maketitle
+
+\section{Intro}
+\paragraph{Expected value function}
+So far, we usually consider problem with expected value $\be [F(x,\omega)]$.
+\begin{enumerate}
+	\item Pros: let us focus on long-term performance (irrespective of the fluctuations of specific outcome realization), justified by the Law of Large Numbers
+	\item Cons: leave out consideration of risks of loss.
+\end{enumerate}
+\paragraph{Classical approach.} use scalar transformation $u: \br \to\br$, also called \textit{disutility function}.
+\begin{enumerate}
+	\item assumed to be nondecreasing and convex
+	\item reformulated as the problem
+	$$
+	\min_{x\in \mathcal X} \be [u(F(x,\omega))]
+	$$
+	\item difficulties: specifying the disutility function
+\end{enumerate}
+Modern approach: use risk measures $Z(\omega)=F(x,\omega)$
+
+
+\paragraph{Mean-risk models.} characterize $Z_x(\omega)$ by mean $\be [Z]$ and risk $\mathbb D[Z]$.
+\begin{enumerate}
+	\item ``efficient" solutions: for a given value of the mean, they minimize the risk, and for a given value of risk they maximize the mean.
+	\item how to find: by techniques of multiobjective optimization
+	$$\rho[Z]=\be [Z]+c\mathbb D[Z]$$
+	$c$ plays the role of the price of risk.  By varying the value of $c$, we can generate a large ensemble of efficient soluitons. 
+	\end{enumerate}
+	
+\section{Common risk functions $\mathbb D[Z]$}
+\begin{enumerate}
+	\item $\mathbb{V}ar [Z]$
+	\item Central semideviations
+		\begin{enumerate}
+			\item Upper semideviation of order $p$: 
+			$$\sigma^+_p[Z]=(\be[(Z-\be[Z])^p_+])^{1/p}.$$ 
+			Appropriate for minimization problems. It is aimed at penalization of an excess of $Z_x$ over its mean. $Z_x$ represents a cost here.
+			\item  Lower semideviation of order $p$: $\sigma^-_p[Z]=(\be[(\be[Z]-Z)^p_+])^{1/p}$.
+			\item A special case: mean absolute deviation
+			$$\sigma_1(Z)=\be [Z-\be [Z]]$$
+			We have $\sigma^+_1[Z]=\sigma^-_1[Z]=1/2\sigma_1[Z]$.
+		\end{enumerate}
+	\item Value-at-risk: 
+			$$V@R_\alpha(Z)=\inf\{t:P(Z>t)\leq \alpha\}.$$
+	However, chance constraints are often nonconvex. Since $V@R_\alpha(Z)\leq 0\Leftrightarrow \be[\boldsymbol 1_{(0,\infty)}(Z)]\leq \alpha$, a possible approach is to constructing a convex approximation of the expected value.
+	\item Average Value-at-Risk (Conditional Value-at-Risk)
+	$$AV@R_\alpha(Z)=\inf\{t+\alpha^{-1}\be[Z-t]_+\}$$
+	is convex and gives a conservative approximation of the chance constraint.
+	\item Weighted Mean Deviations from Quantiles
+		$$q_\alpha[Z]=\be[\max [(1-\alpha)(V@R_\alpha(Z)-Z),\alpha (Z-V@R_\alpha(Z))]]$$
+		\begin{enumerate}
+			\item In the case of minimization, we use $q_{1-\alpha}[Z_x]$ as $\mathbb D[Z]$.
+			If $c\in [0,\alpha^{-1}]$ and $Z_x$ is convex in x, then the problem is convex.
+			\item Related with $AV@R$: 
+			$$AV@R_\alpha(Z)=\be[Z]+\frac{1}{\alpha}q_{1-\alpha}[Z].$$
+			\item Related with absolute semideviation:
+			$$\sigma^+_1[Z]=\max_{\alpha\in[0,1]}q_\alpha[Z].$$
+		\end{enumerate}
+\end{enumerate}
+\section{Coherent risk measures}
+
+
+\paragraph{Risk Measure.} $\rho(Z)$ maps $Z$ into the extended real line for $Z\in \mathcal Z=\mathcal L_p(\Omega,\mathcal F,P)$ where $p\in (1,+\infty]$.
+
+A risk measure $\rho(Z)$ is proper if $\rho(Z)>-\infty$ for all $Z\in \mathcal Z$ and the domain 
+$$\text{dom}\rho=\{Z\in \mathcal Z: \rho(Z)\leq \infty\}$$
+is nonempty.
+\paragraph{Axioms associated with a risk measure $\rho$}
+\begin{enumerate}
+	\item For $Z,Z'\in \mathcal Z$, $Z\succeq Z'\Leftrightarrow Z(\omega)\geq Z'(\omega)$ for a.e. $\omega \in \Omega$.
+	\item We assume the smaller the realization of $Z$, the better.
+\end{enumerate}
+
+A risk measure $\rho$ is \textit{coherent} if it satisfies the following conditions:
+\begin{enumerate}
+	\item (Convexity)
+	$$\rho(tZ+(1-t)Z')\leq t\rho(Z)+(1-t)\rho(Z')$$
+	for all $Z,Z'\in \mathcal Z$ and $t\in[0,1]$.
+	\item (Monotonicity) If $Z,Z'\in \mathcal Z$ and $Z\succeq Z'$, then $\rho(Z)\geq \rho(Z')$.
+	\item (Translation equivariance) For a scalar $a\in \br$ and $Z\in \mathcal Z$, then $\rho (Z+\alpha)=\rho(Z)+\alpha$.
+	\item (Positive homogeneity) If $t>0$ and $Z\in \mathcal Z$, then $\rho(tZ)=t\rho (Z)$.
+\end{enumerate}
+\textit{Examples.} $AV@R_\alpha(Z)$.
+
+\textit{Remark.} We also can define a coherent risk measure $\mathcal Q(Z)=\rho(-Z)$, if the random outcome represents a reward.
+
+\paragraph{Basic duality results.}
+With each space $\mathcal Z= \mathcal L_p(\Omega,\mathcal F,P)$ is associated its dual space $\mathcal Z^*=\mathcal L_q(\Omega,\mathcal F,P)$ where $q\in (1,+\infty]$ is such that $1/p+1/q=1$. For $Z\in \mathcal Z$ and $\zeta\in \mathcal Z^*$, we can define their scalar product
+$$<\zeta,Z>=\int_\Omega \zeta(\omega)Z(\omega) dP(\omega).$$
+Furthermore, the conjugate function $\rho^*$ of $\rho$ is defined as
+$$\rho^*(\zeta)=\sup_{Z\in \mathcal Z}\{<\zeta,Z>-\rho(Z)\}.$$
+
+\begin{thm}
+Suppose that $\rho$ is convex, proper, and lower semicontinuous, then $\rho^{**}=\rho$ with $\zeta\in \mathfrak A=dom(\rho^*)$. 
+\begin{enumerate}
+	\item The monotonicity of $\rho$ holds iff every $\zeta\in \mathfrak A$ is nonnegative.
+	\item The translation equivariance of $\rho$ holds iff $\int_\Omega \zeta dP=1$ for every $\zeta\in\mathfrak A$
+	\item The positive homogeneity OF $\rho$ holds iff $\rho$ is the support function of $\mathfrak A$, i.e. 
+	$$\rho(Z)=\sup_{\zeta\in \mathfrak A}<\zeta,Z> \quad \forall Z\in \mathcal Z.$$
+\end{enumerate}
+\end{thm}
+If $\rho$ is coherent, then $\mathfrak A$ can be viewed as a subset of  the set of a probability density function
+$$\mathfrak B =\{\zeta \in \mathcal Z^*:\int_\Omega \zeta(\omega)dP(\omega)=1,\zeta\succeq 0\}.$$ Consequently, for any $\zeta\in\mathfrak A$, $<\zeta,Z>=\be \zeta[Z]$. So $\rho(Z)$ can be written in the form
+$$\rho(Z)=\sup_{\zeta\in \mathfrak A}\be \zeta[Z].$$
+If $\rho$ is positively homogenous, then $\mathfrak A=\partial \rho(0)$ and $\mathfrak A$ is weakly closed. Furthermore, if $\rho$ is continuous, then $\mathfrak A$ is bounded.
+
+\begin{prop}If $\rho$ is convex and monotone, then $\rho$ is continuous and subdifferentiable on $\mathcal Z$.
+\end{prop}
+\begin{prop}If $\rho$ is convex, monotone and translation equivariant, and the domain of $\rho$ has a nonempty interior. Then $\rho$ is finite valued and continuous on $\mathcal Z$.
+\end{prop}
+\begin{thm}
+$\rho$ is real valued coherent risk measure iff there exists a convex bounded and weakly closed set $\mathfrak A\subset \mathfrak B$ such that $\rho(Z)=\sup_{\zeta\in \mathfrak A}<\zeta,Z> \quad \forall Z\in \mathcal Z.$
+\end{thm}
+
+
+\end{document}
+
